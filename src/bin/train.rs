@@ -24,16 +24,32 @@ impl Args {
         if self.input.extension() != Some(std::ffi::OsStr::new("csv")) {
             return Err("Unexpected file type(not csv)".to_string());
         }
+        // Ok안에 unit 타입 ()를 넣는 것입니다.
+        Ok(())
+    }
+
+    fn validate_alpha(&self) -> Result<(), String> {
+        if self.alpha <= 0.0 || self.alpha >= 1.0 {
+            return Err(format!("LR must be in (0, 1), got {}", self.alpha));
+        }
+        Ok(())
+    }
+
+    fn validate(&self) -> Result<(), String> {
+        // ? 연산자 — match의 축약
+        self.validate_input_path()?;
+        self.validate_alpha()?;
         Ok(())
     }
 }
 
 fn main() {
     let args = Args::parse();
-    args.validate_input_path().unwrap_or_else(|e| {
+    args.validate().unwrap_or_else(|e| {
         eprintln!("Error: {e}");
         std::process::exit(1);
     });
+
     println!("Input: {}", args.input.display());
     println!("Alpha: {}", args.alpha);
 }
