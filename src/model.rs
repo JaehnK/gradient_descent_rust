@@ -1,17 +1,16 @@
-use core::range;
-
 use ndarray::Array2;
 
-struct Model {
+pub struct Model {
     pub theta_0: f64,
     pub theta_1: f64,
 }
 
 impl Model {
-    fn fit(&mut self, data: &Array2<f64>, alpha: f64, epochs: i64) {
-        self.theta_0 = 0.0;
-        self.theta_0 = 0.0;
+    pub fn new(theta_0: f64, theta_1: f64) -> Self {
+        Self { theta_0, theta_1 }
+    }
 
+    pub fn fit(&mut self, data: &Array2<f64>, alpha: f64, epochs: i64) {
         // column은 뷰어 -> 레퍼런스,
         // 소유권 필요 시 .to_owned 사용. 이 경우 힙에 동적할당
         let x = data.column(1); // km     
@@ -37,7 +36,7 @@ impl Model {
         }
     }
 
-    fn load_params(&mut self, params: &Array2<f64>) {
+    pub fn load_params(&mut self, params: &Array2<f64>) {
         self.theta_0 = *params.get((0, 1)).unwrap();
         self.theta_1 = *params.get((0, 1)).unwrap();
     }

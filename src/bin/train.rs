@@ -2,7 +2,7 @@ use clap::Parser;
 use ndarray::Array2;
 use std::path::PathBuf;
 
-use ft_linear_regression::read_csv;
+use ft_linear_regression::{model, read_csv, save_model_params};
 
 #[derive(Parser)]
 struct Args {
@@ -59,5 +59,14 @@ fn main() {
         eprintln!("Error: {e}");
         std::process::exit(1);
     });
-    // println!("{}", data);
+
+    let mut model = model::Model {
+        theta_0: 0.0,
+        theta_1: 0.0,
+    };
+    model.fit(&data, args.alpha, 1000);
+    save_model_params(&model).unwrap_or_else(|e| {
+        eprintln!("Error: {e}");
+        std::process::exit(1);
+    });
 }

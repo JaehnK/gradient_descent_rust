@@ -1,8 +1,17 @@
+use chrono::Local;
 use csv::Reader;
 use ndarray::Array2;
+use serde::{Deserialize, Serialize};
+use std::io::Write;
 use std::path::Path;
 
 pub mod model;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ModelParams {
+    pub theta_0: f64,
+    pub theta_1: f64,
+}
 
 pub fn read_csv(path: &Path) -> Result<Array2<f64>, String> {
     let mut reader: Reader<std::fs::File> = Reader::from_path(path).map_err(|e| e.to_string())?;
@@ -33,4 +42,22 @@ pub fn read_csv(path: &Path) -> Result<Array2<f64>, String> {
     }
 
     Array2::from_shape_vec((nrows, 2), rows).map_err(|e| e.to_string())
+}
+
+pub fn save_model_params(model: &model::Model) -> Result<(), String> {
+    let params = ModelParams {
+        theta_0: model.theta_0,
+        theta_1: model.theta_1,
+    };
+
+    let yaml_string = serde_yaml::to_string(&params).map_err(|e| e.to_string())?;
+
+    let timestamp = Local::now().format("%Y%m%d_%H%M%S").to_string();
+    let filename = format!("params_{}.yaml", timestamp);
+    let mut file = std::fs::File::create(&filename).map_err(|e| e.to_string())?;
+    file.write_all(yaml_string.as_bytes())
+        .map_err(|e| e.to_string())?;
+
+    println!("Model parameters saved to {}", filename);
+    Ok(())
 }
