@@ -1,6 +1,8 @@
 use clap::Parser;
+use ndarray::Array2;
 use std::path::PathBuf;
 
+use ft_linear_regression::read_csv;
 
 #[derive(Parser)]
 struct Args {
@@ -30,7 +32,7 @@ impl Args {
 
     fn validate_alpha(&self) -> Result<(), String> {
         if self.alpha <= 0.0 || self.alpha >= 1.0 {
-            return Err(format!("LR must be in (0, 1), got {}", self.alpha));
+            return Err(format!("alpha must be in (0, 1), got {}", self.alpha));
         }
         Ok(())
     }
@@ -44,7 +46,7 @@ impl Args {
 }
 
 fn main() {
-    let args = Args::parse();
+    let args: Args = Args::parse();
     args.validate().unwrap_or_else(|e| {
         eprintln!("Error: {e}");
         std::process::exit(1);
@@ -52,4 +54,10 @@ fn main() {
 
     println!("Input: {}", args.input.display());
     println!("Alpha: {}", args.alpha);
+
+    let data: Array2<f64> = read_csv(&args.input).unwrap_or_else(|e| {
+        eprintln!("Error: {e}");
+        std::process::exit(1);
+    });
+    // println!("{}", data);
 }
