@@ -13,6 +13,10 @@ struct Args {
     /// 학습률(alpha)
     #[clap(short, long, default_value = "0.01")]
     alpha: f64,
+
+    /// 반복 횟수(epoch)
+    #[clap(short, long)]
+    epoch: u64,
 }
 
 impl Args {
@@ -64,7 +68,7 @@ fn main() {
         theta_0: 0.0,
         theta_1: 0.0,
     };
-    model.fit(&data, args.alpha, 1000);
+    model.fit(&data, args.alpha, args.epoch);
     save_model_params(&model).unwrap_or_else(|e| {
         eprintln!("Error: {e}");
         std::process::exit(1);
