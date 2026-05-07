@@ -10,7 +10,7 @@ impl Model {
         Self { theta_0, theta_1 }
     }
 
-    pub fn fit(&mut self, data: &Array2<f64>, alpha: f64, epochs: i64) {
+    pub fn fit(&mut self, data: &Array2<f64>, alpha: f64, epochs: u64) {
         // column은 뷰어 -> 레퍼런스,
         // 소유권 필요 시 .to_owned 사용. 이 경우 힙에 동적할당
         let x = data.column(1); // km     
