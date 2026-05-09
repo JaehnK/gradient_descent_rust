@@ -15,7 +15,7 @@ impl Model {
         // 소유권 필요 시 .to_owned 사용. 이 경우 힙에 동적할당
         let x = data.column(1); // km     
         let y = data.column(0); // price
-        // as f64 사용 이윺는 아래 residual.sum()이 f64이기 때문
+        // as f64 사용 이유는 아래 residual.sum()이 f64이기 때문
         // 다른 숫자 자료형 간 나눗셈은 허용하지 않음
         let m = data.nrows() as f64; // 데이터의 수
 

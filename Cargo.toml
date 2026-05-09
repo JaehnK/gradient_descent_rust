@@ -10,6 +10,7 @@ csv = "1.3"
 ndarray = "0.17.2"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_yaml = "0.9.34"
+statrs = "0.18.0"
 
 
 [lints.rust]
