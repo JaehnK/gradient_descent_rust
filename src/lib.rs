@@ -3,6 +3,7 @@ use csv::Reader;
 use ndarray::Array2;
 use serde::{Deserialize, Serialize};
 use statrs::statistics::Statistics;
+use std::fs;
 use std::io::Write;
 use std::path::Path;
 
@@ -104,5 +105,14 @@ pub fn save_model_params(
         .map_err(|e| e.to_string())?;
 
     println!("Model parameters saved to {}", filename);
+    Ok(())
+}
+
+pub fn read_yaml() -> Result<(), String> {
+    // let mut yaml_fils: Vec<_> = Vec:new();
+    for entry in fs::read_dir(".").unwrap() {
+        println!("{}", entry.unwrap().file_name().to_string_lossy());
+    }
+
     Ok(())
 }

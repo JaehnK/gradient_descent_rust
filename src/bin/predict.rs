@@ -1,5 +1,7 @@
 use clap::Parser;
 
+use ft_linear_regression::read_yaml;
+
 #[derive(Parser)]
 struct Args {
     /// x (mileage)
@@ -16,11 +18,11 @@ impl Args {
     }
 }
 
-fn main() {
+fn main() -> Result<(), String> {
     let args = Args::parse();
-    args.validate().unwrap_or_else(|e| {
-        eprintln!("Error: {e}");
-        std::process::exit(1);
-    });
+    args.validate().unwrap();
     println!("Input X value: {}", args.x);
+
+    let _ = read_yaml();
+    Ok(())
 }
