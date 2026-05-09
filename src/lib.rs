@@ -120,6 +120,14 @@ pub fn read_yaml() -> Result<ModelParams, String> {
     }
     // println!("{:?}", yaml_files);
 
+    if yaml_files.is_empty() {
+        return Ok(ModelParams {
+            theta_0: 0.0,
+            theta_1: 0.0,
+            x_mean: None,
+            x_std: None,
+        });
+    };
     yaml_files.sort();
     let latest = yaml_files.last().unwrap();
     println!("Reading model parameters from {}", latest.display());
