@@ -1,0 +1,10 @@
+.git
+.gitignore
+.vscode
+.idea
+target
+*.png
+*.yaml
+*.pdf
+*.swp
+*.swo
