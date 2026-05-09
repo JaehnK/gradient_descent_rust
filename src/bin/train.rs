@@ -74,6 +74,13 @@ fn main() -> Result<(), String> {
         println!("Normalise has set True");
         let normalised_data = noramlise_data(&data).unwrap();
         model.fit(&normalised_data.data, args.alpha, args.epoch);
+        let params = ModelParams {
+            theta_0: model.theta_0,
+            theta_1: model.theta_1,
+            x_mean: Some(normalised_data.x_mean),
+            x_std: Some(normalised_data.x_std),
+        };
+        let _ = model.plot_scatterline(&data, Some(&params));
         save_model_params(
             &model,
             Some(normalised_data.x_mean),
@@ -81,6 +88,7 @@ fn main() -> Result<(), String> {
         )
     } else {
         model.fit(&data, args.alpha, args.epoch);
+        let _ = model.plot_scatterline(&data, None);
         save_model_params(&model, None, None)
     }
 }

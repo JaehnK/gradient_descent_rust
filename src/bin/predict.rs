@@ -1,18 +1,21 @@
 use clap::Parser;
 
-use ft_linear_regression::read_yaml;
+use ft_linear_regression::*;
 
 #[derive(Parser)]
 struct Args {
-    /// x (mileage)
+    /// mileage
     #[clap(short, long)]
-    x: f64,
+    mileage: f64,
 }
 
 impl Args {
     fn validate(&self) -> Result<(), String> {
-        if self.x <= 0.0 {
-            return Err(format!("milege must be positive number, got {}", self.x));
+        if self.mileage <= 0.0 {
+            return Err(format!(
+                "mileage must be positive number, got {}",
+                self.mileage
+            ));
         }
         Ok(())
     }
@@ -21,12 +24,19 @@ impl Args {
 fn main() -> Result<(), String> {
     let args = Args::parse();
     args.validate().unwrap();
-    println!("Input X value: {}", args.x);
+    println!("Input mileage: {}", args.mileage);
 
     let params = read_yaml()?;
 
-    let mut model = ft_linear_regression::Model::new(params.theta_0, params.theta_1);
-    let prediction = model.fit(args.x, &params);
-    println!("Prediction: {}", prediction);
+    let model = model::Model {
+        theta_0: params.theta_0,
+        theta_1: params.theta_1,
+    };
+    println!(
+        "Model parameters: theta_0: {:.3}, theta_1: {:.3}",
+        model.theta_0, model.theta_1
+    );
+    let prediction = model.predict(args.mileage, Some(&params));
+    println!("Predicted price: {:.3}", prediction);
     Ok(())
 }

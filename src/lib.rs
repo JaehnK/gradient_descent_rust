@@ -118,10 +118,11 @@ pub fn read_yaml() -> Result<ModelParams, String> {
         }
         // println!("{}", entry.unwrap().file_name().to_string_lossy());
     }
-    println!("{:?}", yaml_files);
+    // println!("{:?}", yaml_files);
 
     yaml_files.sort();
     let latest = yaml_files.last().unwrap();
+    println!("Reading model parameters from {}", latest.display());
 
     let content = fs::read_to_string(latest).unwrap();
     let params: ModelParams = serde_yaml::from_str(&content).unwrap();
