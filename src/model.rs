@@ -6,11 +6,16 @@ use std::error::Error;
 pub struct Model {
     pub theta_0: f64,
     pub theta_1: f64,
+    pub is_converged: bool,
 }
 
 impl Model {
     pub fn new(theta_0: f64, theta_1: f64) -> Self {
-        Self { theta_0, theta_1 }
+        Self {
+            theta_0,
+            theta_1,
+            is_converged: false,
+        }
     }
 
     pub fn fit(&mut self, data: &Array2<f64>, alpha: f64, epochs: u64) {
@@ -42,7 +47,14 @@ impl Model {
         }
 
         // Plot RMSE values
-        let _ = self.plot_rmse(&rmse_values);
+        if rmse_values.len() > 1
+            && rmse_values.iter().all(|&r| r.is_finite())
+            && self.theta_0.is_finite()
+            && self.theta_1.is_finite()
+        {
+            let _ = self.plot_rmse(&rmse_values);
+            self.is_converged = true;
+        }
     }
 
     fn plot_rmse(&self, rmse_values: &[f64]) -> Result<(), Box<dyn Error>> {
@@ -110,6 +122,7 @@ impl Model {
         root.present()?;
         Ok(())
     }
+
     pub fn predict(&self, x: f64, params: Option<&ModelParams>) -> f64 {
         let norm_x = match params {
             Some(params) => match (params.x_mean, params.x_std) {

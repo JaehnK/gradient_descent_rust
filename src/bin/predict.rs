@@ -44,6 +44,7 @@ fn main() -> Result<(), String> {
     let model = model::Model {
         theta_0: params.theta_0,
         theta_1: params.theta_1,
+        is_converged: true,
     };
     println!(
         "Model parameters: theta_0: {:.3}, theta_1: {:.3}",
