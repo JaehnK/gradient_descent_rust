@@ -63,18 +63,18 @@ pub fn noramlise_data(data: &Array2<f64>) -> Result<NormalisedData, String> {
     if x_n < 2.0 {
         return Err("need more values to normalise".to_string());
     }
-    let x_mean = data.column(1).mean();
-    let sum_squared_diff = (&data.column(1) - x_mean).mapv(|x| x.powi(2)).sum();
+    let x_mean = data.column(0).mean();
+    let sum_squared_diff = (&data.column(0) - x_mean).mapv(|x| x.powi(2)).sum();
     let x_std = (sum_squared_diff / (x_n - 1.0)).sqrt();
     if x_std == 0.0 {
         return Err("std is zero".to_string());
     }
 
-    let norm_x = (&data.column(1) - x_mean) / x_std;
+    let norm_x = (&data.column(0) - x_mean) / x_std;
 
     // data의 소유권이 없음으로 클론을 통해 다른 배열 생성
     let mut result = data.clone();
-    result.column_mut(1).assign(&norm_x);
+    result.column_mut(0).assign(&norm_x);
 
     Ok(NormalisedData {
         data: result,
