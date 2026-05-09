@@ -108,11 +108,23 @@ pub fn save_model_params(
     Ok(())
 }
 
-pub fn read_yaml() -> Result<(), String> {
-    // let mut yaml_fils: Vec<_> = Vec:new();
-    for entry in fs::read_dir(".").unwrap() {
-        println!("{}", entry.unwrap().file_name().to_string_lossy());
-    }
+pub fn read_yaml() -> Result<ModelParams, String> {
+    let mut yaml_files = Vec::new();
 
-    Ok(())
+    for entry in fs::read_dir(".").unwrap() {
+        let file = entry.unwrap().path();
+        if file.extension().and_then(|s| s.to_str()) == Some("yaml") {
+            yaml_files.push(file);
+        }
+        // println!("{}", entry.unwrap().file_name().to_string_lossy());
+    }
+    println!("{:?}", yaml_files);
+
+    yaml_files.sort();
+    let latest = yaml_files.last().unwrap();
+
+    let content = fs::read_to_string(latest).unwrap();
+    let params: ModelParams = serde_yaml::from_str(&content).unwrap();
+
+    Ok(params)
 }

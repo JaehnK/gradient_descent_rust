@@ -36,8 +36,12 @@ impl Model {
         }
     }
 
-    pub fn load_params(&mut self, params: &Array2<f64>) {
-        self.theta_0 = *params.get((0, 0)).unwrap();
-        self.theta_1 = *params.get((0, 1)).unwrap();
+    pub fn predict(&self, x: f64, params: &ModelParams) -> f64 {
+        let norm_x = match (params.x_mean, params.x_std) {
+            (Some(mean), Some(std)) => (x - mean) / std, // 둘 다 Some일 때
+            _ => x,                                      // 그 외 모든 경우
+        };
+
+        self.theta_0 + self.theta_1 * norm_x
     }
 }

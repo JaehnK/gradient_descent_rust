@@ -23,6 +23,10 @@ fn main() -> Result<(), String> {
     args.validate().unwrap();
     println!("Input X value: {}", args.x);
 
-    let _ = read_yaml();
+    let params = read_yaml()?;
+
+    let mut model = ft_linear_regression::Model::new(params.theta_0, params.theta_1);
+    let prediction = model.fit(args.x, &params);
+    println!("Prediction: {}", prediction);
     Ok(())
 }
