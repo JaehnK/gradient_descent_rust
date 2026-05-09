@@ -2,6 +2,7 @@ use chrono::Local;
 use csv::Reader;
 use ndarray::Array2;
 use serde::{Deserialize, Serialize};
+use statrs::statistics::Statistics;
 use std::io::Write;
 use std::path::Path;
 
@@ -11,6 +12,16 @@ pub mod model;
 pub struct ModelParams {
     pub theta_0: f64,
     pub theta_1: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub x_mean: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub x_std: Option<f64>,
+}
+
+pub struct NormalisedData {
+    pub data: Array2<f64>,
+    pub x_mean: f64,
+    pub x_std: f64,
 }
 
 pub fn read_csv(path: &Path) -> Result<Array2<f64>, String> {
@@ -44,10 +55,44 @@ pub fn read_csv(path: &Path) -> Result<Array2<f64>, String> {
     Array2::from_shape_vec((nrows, 2), rows).map_err(|e| e.to_string())
 }
 
-pub fn save_model_params(model: &model::Model) -> Result<(), String> {
+pub fn noramlise_data(data: &Array2<f64>) -> Result<NormalisedData, String> {
+    // 이 함수는 z-score기반의 정규화를 활용함
+    // 학습률(alpha)값에 더욱 강건하며, 평균이 0, 분산이 1로 수렴해서 gradient descent가 안정적으로 학습
+
+    let x_n = data.nrows() as f64;
+    if x_n < 2.0 {
+        return Err("need more values to normalise".to_string());
+    }
+    let x_mean = data.column(0).mean();
+    let sum_squared_diff = (&data.column(0) - x_mean).mapv(|x| x.powi(2)).sum();
+    let x_std = (sum_squared_diff / (x_n - 1.0)).sqrt();
+    if x_std == 0.0 {
+        return Err("std is zero".to_string());
+    }
+
+    let norm_x = (&data.column(0) - x_mean) / x_std;
+
+    // data의 소유권이 없음으로 클론을 통해 다른 배열 생성
+    let mut result = data.clone();
+    result.column_mut(0).assign(&norm_x);
+
+    Ok(NormalisedData {
+        data: result,
+        x_mean,
+        x_std,
+    })
+}
+
+pub fn save_model_params(
+    model: &model::Model,
+    x_mean: Option<f64>,
+    x_std: Option<f64>,
+) -> Result<(), String> {
     let params = ModelParams {
         theta_0: model.theta_0,
         theta_1: model.theta_1,
+        x_mean: x_mean,
+        x_std: x_std,
     };
 
     let yaml_string = serde_yaml::to_string(&params).map_err(|e| e.to_string())?;

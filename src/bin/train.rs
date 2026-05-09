@@ -2,7 +2,7 @@ use clap::Parser;
 use ndarray::Array2;
 use std::path::PathBuf;
 
-use ft_linear_regression::{model, read_csv, save_model_params};
+use ft_linear_regression::*;
 
 #[derive(Parser)]
 struct Args {
@@ -17,6 +17,10 @@ struct Args {
     /// 반복 횟수(epoch)
     #[clap(short, long)]
     epoch: u64,
+
+    /// 변수의 정규화 여부
+    #[clap(short, long)]
+    normalize: bool,
 }
 
 impl Args {
@@ -49,7 +53,7 @@ impl Args {
     }
 }
 
-fn main() {
+fn main() -> Result<(), String> {
     let args: Args = Args::parse();
     args.validate().unwrap_or_else(|e| {
         eprintln!("Error: {e}");
@@ -59,18 +63,24 @@ fn main() {
     println!("Input: {}", args.input.display());
     println!("Alpha: {}", args.alpha);
 
-    let data: Array2<f64> = read_csv(&args.input).unwrap_or_else(|e| {
-        eprintln!("Error: {e}");
-        std::process::exit(1);
-    });
+    let data: Array2<f64> = read_csv(&args.input)?;
 
     let mut model = model::Model {
         theta_0: 0.0,
         theta_1: 0.0,
     };
-    model.fit(&data, args.alpha, args.epoch);
-    save_model_params(&model).unwrap_or_else(|e| {
-        eprintln!("Error: {e}");
-        std::process::exit(1);
-    });
+
+    if args.normalize == true {
+        println!("Normalise has set True");
+        let normalised_data = noramlise_data(&data).unwrap();
+        model.fit(&normalised_data.data, args.alpha, args.epoch);
+        save_model_params(
+            &model,
+            Some(normalised_data.x_mean),
+            Some(normalised_data.x_std),
+        )
+    } else {
+        model.fit(&data, args.alpha, args.epoch);
+        save_model_params(&model, None, None)
+    }
 }

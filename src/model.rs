@@ -37,7 +37,7 @@ impl Model {
     }
 
     pub fn load_params(&mut self, params: &Array2<f64>) {
-        self.theta_0 = *params.get((0, 1)).unwrap();
+        self.theta_0 = *params.get((0, 0)).unwrap();
         self.theta_1 = *params.get((0, 1)).unwrap();
     }
 }
