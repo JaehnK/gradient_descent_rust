@@ -37,7 +37,9 @@ fn main() -> Result<(), String> {
         .trim()
         .parse()
         .map_err(|e: std::num::ParseFloatError| e.to_string())?;
-
+    if mileage < 0.0 {
+        return Err("mileage must be non-negative".to_string());
+    }
     println!("Input mileage: {}", mileage);
     let params = read_yaml().unwrap_or_else(|e| {
         eprintln!("Error: {e}");
