@@ -39,7 +39,10 @@ fn main() -> Result<(), String> {
         .map_err(|e: std::num::ParseFloatError| e.to_string())?;
 
     println!("Input mileage: {}", mileage);
-    let params = read_yaml()?;
+    let params = read_yaml().unwrap_or_else(|e| {
+        eprintln!("Error: {e}");
+        std::process::exit(1);
+    });
 
     let model = model::Model {
         theta_0: params.theta_0,
