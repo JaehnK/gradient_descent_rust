@@ -12,6 +12,10 @@ pub mod model;
 pub struct ModelParams {
     pub theta_0: f64,
     pub theta_1: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub x_mean: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub x_std: Option<f64>,
 }
 
 pub struct NormalisedData {
@@ -79,10 +83,16 @@ pub fn noramlise_data(data: &Array2<f64>) -> Result<NormalisedData, String> {
     })
 }
 
-pub fn save_model_params(model: &model::Model) -> Result<(), String> {
+pub fn save_model_params(
+    model: &model::Model,
+    x_mean: Option<f64>,
+    x_std: Option<f64>,
+) -> Result<(), String> {
     let params = ModelParams {
         theta_0: model.theta_0,
         theta_1: model.theta_1,
+        x_mean: x_mean,
+        x_std: x_std,
     };
 
     let yaml_string = serde_yaml::to_string(&params).map_err(|e| e.to_string())?;
